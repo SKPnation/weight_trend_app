@@ -15,15 +15,12 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
   TextEditingController weightEntryTEC = new TextEditingController();
 
   FirebaseAuth _auth = FirebaseAuth.instance;
 
   CollectionReference weightRef =
-  FirebaseFirestore
-      .instance
-      .collection('weight');
+      FirebaseFirestore.instance.collection('weight');
 
   static const String signOut = 'Sign out';
 
@@ -50,8 +47,7 @@ class _HomePageState extends State<HomePage> {
               onSelected: optionAction,
               itemBuilder: (BuildContext context) {
                 return menuOptions.map((String option) {
-                  return PopupMenuItem(
-                      value: option, child: Text(option));
+                  return PopupMenuItem(value: option, child: Text(option));
                 }).toList();
               })
         ],
@@ -59,7 +55,7 @@ class _HomePageState extends State<HomePage> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.orange,
         splashColor: Colors.green,
-        onPressed: () async{
+        onPressed: () async {
           _showModalBottomSheet(context);
         },
         child: Center(
@@ -71,19 +67,19 @@ class _HomePageState extends State<HomePage> {
       ),
       body: SafeArea(
         child: StreamBuilder(
-          stream: weightRef
-              .orderBy('timestamp', descending: true)
-              .snapshots(),
-          builder: (context, snapshot){
-            if(snapshot.hasData){
+          stream: weightRef.orderBy('timestamp', descending: true).snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              lastWeight = snapshot.data.docs[0].data()['weight'];
               return ListView.builder(
                 reverse: false,
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 12, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 itemCount: snapshot.data.docs.length,
-                  itemBuilder: (context, index) =>
-                      _buildWeightWidget(index,
-                          snapshot: snapshot.data.docs[index]),
+                itemBuilder: (context, index) {
+                  return _buildWeightWidget(index,
+                      snapshot: snapshot.data.docs[index]);
+                },
               );
             } else {
               return Center(
@@ -99,25 +95,22 @@ class _HomePageState extends State<HomePage> {
   }
 
   ///menu option method
-  void optionAction(String option) async{
+  void optionAction(String option) async {
     if (option == signOut) {
       await _auth.signOut();
       Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(
-              builder: (context) =>
-                  SignInPage()
-          ), (route) => false
-      );
+          MaterialPageRoute(builder: (context) => SignInPage()),
+          (route) => false);
       print('$signOut');
     }
   }
 
-  var weightArray = [];
+  int lastWeight = 0;
 
   ///Weight item widget
   Widget _buildWeightWidget(index,
-  {loader = false, QueryDocumentSnapshot snapshot}) {
+      {loader = false, QueryDocumentSnapshot snapshot}) {
     String date, time;
     String weight;
     String type;
@@ -126,13 +119,17 @@ class _HomePageState extends State<HomePage> {
     final dateFormat = DateFormat('dd-MM-yyyy');
 
     if (snapshot != null) {
-      weightArray.add(snapshot.data()['weight']);
       data = snapshot.data();
-      date = dateFormat.format(DateTime.fromMillisecondsSinceEpoch(data['timestamp'].toInt())
-          .toLocal()).toString();
+      date = dateFormat
+          .format(DateTime.fromMillisecondsSinceEpoch(data['timestamp'].toInt())
+              .toLocal())
+          .toString();
       weight = data['weight'].toString();
       type = data['trendType'];
-      time = timeFormat.format(DateTime.fromMillisecondsSinceEpoch(data['timestamp'].toInt()).toLocal()).toString();
+      time = timeFormat
+          .format(DateTime.fromMillisecondsSinceEpoch(data['timestamp'].toInt())
+              .toLocal())
+          .toString();
     }
 
     if (loader) {
@@ -144,51 +141,41 @@ class _HomePageState extends State<HomePage> {
       );
     }
     return GestureDetector(
-      onTap: (){
+      onTap: () {
         displaySnackbar('Double tap or long press for other options', context);
       },
-      onDoubleTap: (){
+      onDoubleTap: () {
         //..
       },
-      onLongPress: (){
+      onLongPress: () {
         //..
       },
       child: Container(
         margin: EdgeInsets.all(8),
-        height: displayHeight(context)*0.1,
+        height: displayHeight(context) * 0.12,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          color: Colors.white
-        ),
+            borderRadius: BorderRadius.circular(12), color: Colors.white),
         padding: EdgeInsets.all(12),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+              Text(
+                '$weight' 'kg',
+                style: TextStyle(
+                    color: Colors.green,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold),
+              ),
+              Icon(
+                type == 'up' ? Icons.trending_up : Icons.trending_down,
+                color: Colors.blue,
+                size: 36,
+              )
+            ]),
             Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children:
-                [
-                  Text('$weight''kg',
-                    style: TextStyle(
-                      color: Colors.green,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold
-                    ),),
-                  Icon(type == 'up'
-                      ? Icons.trending_up
-                      : Icons.trending_down,
-                      color: Colors.blue,
-                  size: 36,)
-                ]
-            ),
-            Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children:
-                [
-                  Text(time),
-                  Text(date)
-                ]
-            )
+                children: [Text(time), Text(date)])
           ],
         ),
       ),
@@ -196,89 +183,81 @@ class _HomePageState extends State<HomePage> {
   }
 
   //Display weight entry field
-  void _showModalBottomSheet(BuildContext context)
-  {
+  void _showModalBottomSheet(BuildContext context) {
     showModalBottomSheet(
         context: context,
         isScrollControlled: true,
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(topLeft: Radius.circular(10),topRight: Radius.circular(10) )),
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(10), topRight: Radius.circular(10))),
         backgroundColor: Colors.white,
-        builder: (BuildContext context){
-          return Container (
-            padding: EdgeInsets.all(displayWidth(context)*0.08),
+        builder: (BuildContext context) {
+          return Container(
+            padding: EdgeInsets.all(displayWidth(context) * 0.08),
             height: 360,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('Your current weight',
                     style: TextStyle(
-                        fontSize: displayWidth(context)*0.048,
+                        fontSize: displayWidth(context) * 0.048,
                         fontWeight: FontWeight.bold,
-                        color: Colors.green
-                    )),
-                SizedBox(height: displayHeight(context)*0.04),
+                        color: Colors.green)),
+                SizedBox(height: displayHeight(context) * 0.04),
                 TextFormField(
                     controller: weightEntryTEC,
-                    inputFormatters: [
-                      FilteringTextInputFormatter.digitsOnly
-                    ],
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     decoration: InputDecoration(
                       labelText: 'Weight',
                       fillColor: Colors.transparent,
                       filled: true,
                       hintText: "in Kg",
-                      hintStyle:
-                      TextStyle(fontSize: displayWidth(context) / 25, color: Colors.grey),
+                      hintStyle: TextStyle(
+                          fontSize: displayWidth(context) / 25,
+                          color: Colors.grey),
                       // If  you are using latest version of flutter then lable text and hint text shown like this
                       // if you r using flutter less then 1.20.* then maybe this is not working properly
                       floatingLabelBehavior: FloatingLabelBehavior.always,
                       //prefixIcon: CustomSurffixIcon(svgIcon: "assets/icons/Mail.svg"),
                     )),
-                SizedBox(height: displayHeight(context)*0.04),
+                SizedBox(height: displayHeight(context) * 0.04),
                 Center(
                     child: SizedBox(
-                      width: double.infinity,
-                      height: displayHeight(context)*0.06,
-                      child: ElevatedButton(
-                          onPressed: () async{
-                            if(weightEntryTEC.text.isEmpty){
-                              await Navigator.of(context).pop();
-                              displaySnackbar('Field is empty', context);
-                            } else {
-                              if(data['weight'] !=null)
-                              {
-                                if(weightArray[weightArray.length-1] < int.parse(weightEntryTEC.text.toString()) ||
-                                    weightArray[weightArray.length-1] == int.parse(weightEntryTEC.text.toString()))
-                                {
-                                  saveToDatabase('up');
-                                } else {
-                                  saveToDatabase('down');
-                                }
-                              } else {
-                                saveToDatabase('up');
-                              }
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                              primary: Colors.green),
-                          child: Text('Save', style:
-                          TextStyle(fontSize: displayWidth(context)*0.040))),
-                    )
-                )
-              ],),
+                  width: double.infinity,
+                  height: displayHeight(context) * 0.06,
+                  child: ElevatedButton(
+                      onPressed: () async {
+                        if (weightEntryTEC.text.isEmpty) {
+                          Navigator.of(context).pop();
+                          displaySnackbar('Field is empty', context);
+                        } else {
+                          if (lastWeight <=
+                              int.parse(weightEntryTEC.text.toString())) {
+                            saveToDatabase('up');
+                          } else {
+                            saveToDatabase('down');
+                          }
+                          weightEntryTEC.clear();
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(primary: Colors.green),
+                      child: Text('Save',
+                          style: TextStyle(
+                              fontSize: displayWidth(context) * 0.040))),
+                ))
+              ],
+            ),
           );
-        }
-    );
+        });
   }
 
-  void saveToDatabase(String trend) async{
+  void saveToDatabase(String trend) async {
     await weightRef.add({
       'uid': _auth.currentUser.uid,
-      'weight': weightEntryTEC.text,
+      'weight': int.parse(weightEntryTEC.text),
       'timestamp': DateTime.now().toUtc().millisecondsSinceEpoch,
       'trendType': trend
-    }).then((value){
+    }).then((value) {
       Navigator.of(context).pop();
       displaySnackbar('Saved successfully!', context);
     });
