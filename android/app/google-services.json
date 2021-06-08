@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "709687328901",
+    "project_id": "weighttrend-8de17",
+    "storage_bucket": "weighttrend-8de17.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:709687328901:android:ad9b30fda398cc41dfe9ec",
+        "android_client_info": {
+          "package_name": "com.sli.weightTrendApp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "709687328901-pufp1rbvtqlb209cm5np089utsd107ek.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAJ-Nr5Y7waQ3sx3z26uJPRi6NRO2FU1AQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "709687328901-pufp1rbvtqlb209cm5np089utsd107ek.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "709687328901-app677ul3so58nn7nrlq21dgfa1to4q2.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.sli.weightTrendApp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
